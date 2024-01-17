@@ -113,7 +113,7 @@ export function SettingsModal({ children }: { children: ReactElement }) {
             <List.Item>
               <Text size="sm">
                 <Anchor
-                  href="https://platform.openai.com/account/api-keys"
+                  href="https://smartfactory-gpt4.openai.azure.com/account/api-keys"
                   target="_blank"
                 >
                   Get your OpenAI API key
