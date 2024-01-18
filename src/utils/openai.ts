@@ -110,7 +110,7 @@ export async function createStreamChatCompletion(
     let pres = new pptxgen()
     let slide: any = null
     let textRows: any = [];
-    let title_textboxOpts = { x: 0.1, y: 0.3, fontSize: 32, color: "363636", bold: true };
+    let title_textboxOpts = { x: 0.1, y: 0.3, fontSize: 24, color: "363636", bold: true };
     let text_textboxOpts = { x: 0.1, y: 0.65, fontSize: 11, color: "363636" };
     content.split('\n').forEach(ppt_line => {
       console.log(ppt_line)
