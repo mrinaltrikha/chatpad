@@ -1,9 +1,21 @@
 import { encode } from "gpt-token-utils";
 // import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 const { OpenAIClient, AzureKeyCredential, Configuration } = require("@azure/openai");
+const { setLogLevel } = require("@azure/logger");
 import { OpenAIExt } from "openai-ext";
 import { db } from "../db";
 import { config } from "./config";
+
+setLogLevel("info");
+
+// https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython&pivots=programming-language-javascript
+// Set the Azure and AI Search values from environment variables
+const endpoint = "https://smartfactory-gpt4.openai.azure.com/" //process.env["AOAIEndpoint"];
+const azureApiKey = "" //process.env["AOAIKey"];
+const searchEndpoint = "https://genaihackathonaisearch.search.windows.net" //process.env["SearchEndpoint"];
+const searchKey = "" //process.env["SearchKey"];
+const searchIndex = "disc" //process.env["SearchIndex"];
+const deploymentId = "DISC" //process.env["AOAIDeploymentId"];
 
 function getClient(
   apiKey: string,
@@ -21,7 +33,7 @@ function getClient(
 
   // return new OpenAIApi(configuration);
   return new OpenAIClient(
-    "https://smartfactory-gpt4.openai.azure.com/", 
+    "https://smartfactory-gpt4.openai.azure.com/",
     new AzureKeyCredential(apiKey)
   )
 }
@@ -58,16 +70,32 @@ export async function createStreamChatCompletion(
   // );
 
   let client = new OpenAIClient(
-    "https://smartfactory-gpt4.openai.azure.com/", 
+    "https://smartfactory-gpt4.openai.azure.com/",
     new AzureKeyCredential(apiKey)
   );
-  const events = await client.streamChatCompletions("Gpt-4", messages, { maxTokens: 128 });
+  const events = await client.streamChatCompletions(deploymentId, messages, {
+    azureExtensionOptions: {
+      extensions: [
+        {
+          type: "AzureCognitiveSearch",
+          endpoint: searchEndpoint,
+          key: searchKey,
+          indexName: searchIndex,
+        },
+      ],
+    },
+    maxTokens: 2048
+  });
   let content = "";
   for await (const event of events) {
+    // console.log("event:")
+    // console.log(event);
     for (const choice of event.choices) {
+      // console.log("choice:")
+      // console.log(choice);
       const delta = choice.delta?.content;
       if (delta !== undefined) {
-        console.log(`Chatbot: ${delta}`);
+        // console.log(`Chatbot: ${delta}`);
         content += delta
         setStreamContent(messageId, content, false);
       }
@@ -124,10 +152,20 @@ export async function createChatCompletion(
   //     },
   //   }
   // );
-  // return await client.streamChatCompletions("Gpt-4", messages, { maxTokens: 128 });
+  // return await client.streamChatCompletions(deploymentId, messages, { maxTokens: 128 });
   return {
-    data: await client.getChatCompletions("Gpt-4", messages, {
-      maxTokens: 128
+    data: await client.getChatCompletions(deploymentId, messages, {
+      azureExtensionOptions: {
+        extensions: [
+          {
+            type: "AzureCognitiveSearch",
+            endpoint: searchEndpoint,
+            key: searchKey,
+            indexName: searchIndex,
+          },
+        ],
+      },
+      maxTokens: 2048
     })
   };
 }
