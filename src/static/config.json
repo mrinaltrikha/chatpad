@@ -134,7 +134,7 @@
         "label": "Explain Like I'm Five"
       }
     ],
-    "showDownloadLink": false,
+    "showDownloadLink": true,
     "allowDarkModeToggle": true,
     "allowSettingsModal": true,
     "allowDatabaseModal": true,
