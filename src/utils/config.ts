@@ -24,8 +24,12 @@ interface AvailableModel {
 }
   
 interface WritingCharacter {
-    label: string;
     value: string;
+    label: string;
+    searchEndpoint: string;
+    searchKey: string;
+    searchIndex: string;
+    roleInformation: string;
 }
   
 interface WritingFormat {

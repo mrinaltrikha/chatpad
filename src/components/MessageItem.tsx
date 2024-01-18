@@ -19,7 +19,7 @@ import { Message } from "../db";
 import "../styles/markdown.scss";
 import { CreatePromptModal } from "./CreatePromptModal";
 import { LogoIcon } from "./Logo";
-import { ScrollIntoView } from "./ScrollIntoView";
+import React from "react";
 
 export function MessageItem({ message }: { message: Message }) {
   const clipboard = useClipboard({ timeout: 500 });
@@ -29,7 +29,7 @@ export function MessageItem({ message }: { message: Message }) {
   }, [message.content]);
 
   return (
-    <ScrollIntoView>
+    <React.Fragment>
       <Card withBorder>
         <Flex gap="sm">
           {message.role === "user" && (
@@ -98,6 +98,6 @@ export function MessageItem({ message }: { message: Message }) {
           </Box>
         </Flex>
       </Card>
-    </ScrollIntoView>
+    </React.Fragment>
   );
 }

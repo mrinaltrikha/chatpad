@@ -11,16 +11,14 @@ setLogLevel("info");
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/use-your-data-quickstart?tabs=command-line%2Cpython&pivots=programming-language-javascript
 // Set the Azure and AI Search values from environment variables
 const endpoint = "https://smartfactory-gpt4.openai.azure.com/" //process.env["AOAIEndpoint"];
-const azureApiKey = "" //process.env["AOAIKey"];
-const searchEndpoint = "https://genaihackathonaisearch.search.windows.net" //process.env["SearchEndpoint"];
-const searchKey = "" //process.env["SearchKey"];
-const searchIndex = "disc" //process.env["SearchIndex"];
+// const azureApiKey = "" //process.env["AOAIKey"];
+// const searchEndpoint = "https://genaihackathonaisearch.search.windows.net" //process.env["SearchEndpoint"];
+// const searchKey = "fN5SNhCRnmhsZgZnVxfmkmzUzW6V57ff4NOQi7VSrcAzSeA2fzCu" //process.env["SearchKey"];
+// const searchIndex = "disc" //process.env["SearchIndex"];
 const deploymentId = "DISC" //process.env["AOAIDeploymentId"];
 
 function getClient(
   apiKey: string,
-  apiType: string,
-  apiAuth: string,
   basePath: string
 ) {
   // const configuration = new Configuration({
@@ -33,7 +31,7 @@ function getClient(
 
   // return new OpenAIApi(configuration);
   return new OpenAIClient(
-    "https://smartfactory-gpt4.openai.azure.com/",
+    basePath,
     new AzureKeyCredential(apiKey)
   )
 }
@@ -42,7 +40,11 @@ export async function createStreamChatCompletion(
   apiKey: string,
   messages: any[],
   chatId: string,
-  messageId: string
+  messageId: string,
+  searchEndpoint: string | undefined,
+  searchKey: string | undefined,
+  searchIndex: string | undefined,
+  roleInformation: string | undefined
 ) {
   const settings = await db.settings.get("general");
   const model = settings?.openAiModel ?? config.defaultModel;
@@ -69,40 +71,40 @@ export async function createStreamChatCompletion(
   //   }
   // );
 
-  let client = new OpenAIClient(
-    "https://smartfactory-gpt4.openai.azure.com/",
-    new AzureKeyCredential(apiKey)
-  );
-  const events = await client.streamChatCompletions(deploymentId, messages, {
-    azureExtensionOptions: {
-      extensions: [
+  let client = getClient(apiKey, endpoint);
+  let chatCompletionsOptions: any = {
+    maxTokens: 2048
+  }
+  if (searchIndex) {
+    chatCompletionsOptions["azureExtensionOptions"] = {
+      "extensions": [
         {
-          type: "AzureCognitiveSearch",
-          endpoint: searchEndpoint,
-          key: searchKey,
-          indexName: searchIndex,
-          semanticConfiguration: "default",
-          queryType: "vectorSemanticHybrid",
-          fieldsMapping: {
-            contentFieldsSeparator: "\n",
-            contentFields: [
+          "type": "AzureCognitiveSearch",
+          "endpoint": searchEndpoint,
+          "key": searchKey,
+          "indexName": searchIndex,
+          "semanticConfiguration": "default",
+          "queryType": "vectorSemanticHybrid",
+          "fieldsMapping": {
+            "contentFieldsSeparator": "\n",
+            "contentFields": [
               "content"
             ],
-            filepathField: "filepath",
-            titleField: "title",
-            urlField: "url",
-            vectorFields: [
+            "filepathField": "filepath",
+            "titleField": "title",
+            "urlField": "url",
+            "vectorFields": [
               "contentVector"
             ]
           },
-          embeddingDeploymentName: "text-embedding-ada-002",
-          inScope: true,
-          roleInformation: "- You are a supply chain expert working at Deloitte Canada\n- You have been provided with a document called DISC. When asked a question, leverage your learnings from the DISC\n- Leverage your existing knowledge base to further enhance the response\n- If you don't find relevant information in DISC, ask the users for further information and use your existing knowledge to give answers\n-Your first message should be “Welcome to Deloitte Integrated Supply Chain (DISC) AI Chatbot. What can I help you with today?”\n- Respond in Formal tone\n- Answer as concise as possible"
+          "embeddingDeploymentName": "text-embedding-ada-002",
+          "inScope": true,
+          "roleInformation": roleInformation
         },
       ],
-    },
-    maxTokens: 2048
-  });
+    }
+  }
+  const events = await client.streamChatCompletions(deploymentId, messages, chatCompletionsOptions);
   let content = "";
   for await (const event of events) {
     // console.log("event:")
@@ -118,6 +120,7 @@ export async function createStreamChatCompletion(
       }
     }
   }
+  setStreamContent(messageId, content, true);
   setTotalTokens(chatId, content);
 }
 
@@ -152,37 +155,10 @@ export async function createChatCompletion(
   const base = settings?.openAiApiBase ?? config.defaultBase;
   const version = settings?.openAiApiVersion ?? config.defaultVersion;
 
-  const client = getClient(apiKey, type, auth, base);
-  // return client.createChatCompletion(
-  //   {
-  //     model,
-  //     stream: false,
-  //     messages,
-  //   },
-  //   {
-  //     headers: {
-  //       "Content-Type: "application/json",
-  //       ...(type === "custom" && auth === "api-key" && { "api-key: apiKey }),
-  //     },
-  //     params: {
-  //       ...(type === "custom" && { "api-version: version }),
-  //     },
-  //   }
-  // );
-  // return await client.streamChatCompletions(deploymentId, messages, { maxTokens: 128 });
+  const client = getClient(apiKey, endpoint);
   return {
     data: await client.getChatCompletions(deploymentId, messages, {
-      azureExtensionOptions: {
-        extensions: [
-          {
-            type: "AzureCognitiveSearch",
-            endpoint: searchEndpoint,
-            key: searchKey,
-            indexName: searchIndex,
-          },
-        ],
-      },
-      maxTokens: 2048
+      maxTokens: 128
     })
   };
 }
@@ -191,7 +167,7 @@ export async function checkOpenAIKey(apiKey: string) {
   return createChatCompletion(apiKey, [
     {
       role: "user",
-      content: "hello",
+      content: "Hello",
     },
   ]);
 }

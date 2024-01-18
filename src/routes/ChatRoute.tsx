@@ -24,6 +24,7 @@ import {
   createChatCompletion,
   createStreamChatCompletion,
 } from "../utils/openai";
+import { ScrollIntoView } from "../components/ScrollIntoView";
 
 export function ChatRoute() {
   const chatId = useChatId();
@@ -55,9 +56,9 @@ export function ChatRoute() {
 
   const getSystemMessage = () => {
     const message: string[] = [];
-    if (writingCharacter) message.push(`You are ${writingCharacter}.`);
-    if (writingTone) message.push(`Respond in ${writingTone} tone.`);
-    if (writingStyle) message.push(`Respond in ${writingStyle} style.`);
+    if (writingCharacter) message.push(`${config.writingCharacters.find(x => x.value == writingCharacter)?.roleInformation}`);
+    if (writingTone) message.push(`\n- Respond in ${writingTone} tone.`);
+    if (writingStyle) message.push(`\n- Respond in ${writingStyle} style.`);
     if (writingFormat) message.push(writingFormat);
     if (message.length === 0)
       message.push(
@@ -122,7 +123,11 @@ export function ChatRoute() {
           { role: "user", content },
         ],
         chatId,
-        messageId
+        messageId,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchEndpoint : undefined,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchKey : undefined,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchIndex : undefined,
+        writingCharacter ? getSystemMessage() : undefined
       );
 
       setSubmitting(false);
@@ -225,13 +230,15 @@ export function ChatRoute() {
           ))}
         </Stack>
         {submitting && (
-          <Card withBorder mt="xs">
-            <Skeleton height={8} radius="xl" />
-            <Skeleton height={8} mt={6} radius="xl" />
-            <Skeleton height={8} mt={6} radius="xl" />
-            <Skeleton height={8} mt={6} radius="xl" />
-            <Skeleton height={8} mt={6} width="70%" radius="xl" />
-          </Card>
+          <ScrollIntoView>
+            <Card withBorder mt="xs">
+              <Skeleton height={8} radius="xl" />
+              <Skeleton height={8} mt={6} radius="xl" />
+              <Skeleton height={8} mt={6} radius="xl" />
+              <Skeleton height={8} mt={6} radius="xl" />
+              <Skeleton height={8} mt={6} width="70%" radius="xl" />
+            </Card>
+          </ScrollIntoView>
         )}
       </Container>
       <Box
