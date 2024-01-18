@@ -121,6 +121,14 @@ export async function createStreamChatCompletion(
         }
         slide = pres.addSlide()
         textRows = []
+      } else if (ppt_line.startsWith('**Slide ')) {
+        if (slide) {
+          slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
+        }
+        slide = pres.addSlide()
+        textRows = []
+        let titleText = ppt_line.replace('**', '')
+        slide.addText(titleText, title_textboxOpts);
       } else if (ppt_line.startsWith('Title:') && slide) {
         let titleText = ppt_line.replace('Title: ', '')
         slide.addText(titleText, title_textboxOpts);
