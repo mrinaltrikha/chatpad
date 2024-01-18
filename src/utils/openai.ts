@@ -81,6 +81,23 @@ export async function createStreamChatCompletion(
           endpoint: searchEndpoint,
           key: searchKey,
           indexName: searchIndex,
+          semanticConfiguration: "default",
+          queryType: "vectorSemanticHybrid",
+          fieldsMapping: {
+            contentFieldsSeparator: "\n",
+            contentFields: [
+              "content"
+            ],
+            filepathField: "filepath",
+            titleField: "title",
+            urlField: "url",
+            vectorFields: [
+              "contentVector"
+            ]
+          },
+          embeddingDeploymentName: "text-embedding-ada-002",
+          inScope: true,
+          roleInformation: "- You are a supply chain expert working at Deloitte Canada\n- You have been provided with a document called DISC. When asked a question, leverage your learnings from the DISC\n- Leverage your existing knowledge base to further enhance the response\n- If you don't find relevant information in DISC, ask the users for further information and use your existing knowledge to give answers\n-Your first message should be “Welcome to Deloitte Integrated Supply Chain (DISC) AI Chatbot. What can I help you with today?”\n- Respond in Formal tone\n- Answer as concise as possible"
         },
       ],
     },
@@ -144,11 +161,11 @@ export async function createChatCompletion(
   //   },
   //   {
   //     headers: {
-  //       "Content-Type": "application/json",
-  //       ...(type === "custom" && auth === "api-key" && { "api-key": apiKey }),
+  //       "Content-Type: "application/json",
+  //       ...(type === "custom" && auth === "api-key" && { "api-key: apiKey }),
   //     },
   //     params: {
-  //       ...(type === "custom" && { "api-version": version }),
+  //       ...(type === "custom" && { "api-version: version }),
   //     },
   //   }
   // );
