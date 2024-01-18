@@ -5,6 +5,7 @@ const { setLogLevel } = require("@azure/logger");
 import { OpenAIExt } from "openai-ext";
 import { db } from "../db";
 import { config } from "./config";
+import pptxgen from "pptxgenjs";
 
 setLogLevel("info");
 
@@ -48,28 +49,6 @@ export async function createStreamChatCompletion(
 ) {
   const settings = await db.settings.get("general");
   const model = settings?.openAiModel ?? config.defaultModel;
-
-  // return OpenAIExt.streamClientChatCompletion(
-  //   {
-  //     model,
-  //     messages,
-  //   },
-  //   {
-  //     apiKey: apiKey,
-  //     handler: {
-  //       onContent(content, isFinal, stream) {
-  //         setStreamContent(messageId, content, isFinal);
-  //         if (isFinal) {
-  //           setTotalTokens(chatId, content);
-  //         }
-  //       },
-  //       onDone(stream) {},
-  //       onError(error, stream) {
-  //         console.error(error);
-  //       },
-  //     },
-  //   }
-  // );
 
   let client = getClient(apiKey, endpoint);
   let chatCompletionsOptions: any = {
@@ -122,6 +101,44 @@ export async function createStreamChatCompletion(
   }
   setStreamContent(messageId, content, true);
   setTotalTokens(chatId, content);
+
+  // console.log('Final Content:')
+  // console.log(content)
+
+  if (content) {
+    // Create presentation
+    let pres = new pptxgen()
+    let slide: any = null
+    let textRows: any = [];
+    let title_textboxOpts = { x: 0.1, y: 0.3, fontSize: 32, color: "363636" };
+    let text_textboxOpts = { x: 0.1, y: 0.65, fontSize: 11, color: "363636" };
+    content.split('\n').forEach(ppt_line => {
+      console.log(ppt_line)
+
+      if (ppt_line.startsWith('Slide ')) {
+        if (slide) {
+          slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
+        }
+        slide = pres.addSlide()
+        textRows = []
+      } else if (ppt_line.startsWith('Title:') && slide) {
+        let titleText = ppt_line.replace('Title: ', '')
+        slide.addText(titleText, title_textboxOpts);
+      } else if (slide) {
+        textRows.push([{
+          text: ppt_line,
+          options: { bullet: false }
+        }])
+      }
+    })
+    if (slide) {
+      slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
+    }
+
+    if (slide) {
+      pres.writeFile();
+    }
+  }
 }
 
 function setStreamContent(

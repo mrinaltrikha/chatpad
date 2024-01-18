@@ -167,6 +167,7 @@ export function ChatRoute() {
         }
       }
     } catch (error: any) {
+      console.log(error)
       if (error.toJSON().message === "Network Error") {
         notifications.show({
           title: "Error",
