@@ -110,7 +110,7 @@ export async function createStreamChatCompletion(
     let pres = new pptxgen()
     let slide: any = null
     let textRows: any = [];
-    let title_textboxOpts = { x: 0.1, y: 0.3, fontSize: 32, color: "363636" };
+    let title_textboxOpts = { x: 0.1, y: 0.3, fontSize: 32, color: "363636", bold: true };
     let text_textboxOpts = { x: 0.1, y: 0.65, fontSize: 11, color: "363636" };
     content.split('\n').forEach(ppt_line => {
       console.log(ppt_line)
@@ -127,12 +127,21 @@ export async function createStreamChatCompletion(
         }
         slide = pres.addSlide()
         textRows = []
-        let titleText = ppt_line.replace('**', '')
+        let titleText = ppt_line.replaceAll('**', '')
         slide.addText(titleText, title_textboxOpts);
       } else if (ppt_line.startsWith('Title:') && slide) {
         let titleText = ppt_line.replace('Title: ', '')
         slide.addText(titleText, title_textboxOpts);
       } else if (slide) {
+        let firstChar = ''
+        if (ppt_line != '') {
+          firstChar = ppt_line.charAt(0)
+        }
+
+        if (/^\d+$/.test(firstChar)) {
+          ppt_line = '    ' + ppt_line
+        }
+
         textRows.push([{
           text: ppt_line,
           options: { bullet: false }
