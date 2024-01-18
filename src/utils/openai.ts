@@ -102,8 +102,8 @@ export async function createStreamChatCompletion(
   setStreamContent(messageId, content, true);
   setTotalTokens(chatId, content);
 
-  // console.log('Final Content:')
-  // console.log(content)
+  console.log('Final Content:')
+  console.log(content)
 
   if (content) {
     // Create presentation
@@ -150,8 +150,6 @@ export async function createStreamChatCompletion(
             options: { bullet: false }
           }])
         }
-
-        
       }
     })
     if (slide) {
