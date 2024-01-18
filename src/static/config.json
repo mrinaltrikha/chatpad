@@ -55,18 +55,18 @@
       {
         "value": "DISC_genie",
         "label": "DISC Genie",
-        "searchEndpoint": "https://genaihackathonaisearch.search.windows.net",
-        "searchKey": "",
-        "searchIndex": "disc",
-        "roleInformation": "- You are a Supply Chain expert working at Deloitte Canada\n- You have been provided with a document called DISC. When asked a question, leverage your learnings from DISC\n- Leverage your existing knowledge base to further enhance the response\n- If you don't find relevant information in DISC, ask the users for further information and use your existing knowledge to give answers\n-Your first message should be 'Welcome to Deloitte Integrated Supply Chain (DISC) AI Chatbot. What can I help you with today?'."
+        "searchendpoint": "https://genaihackathonaisearch.search.windows.net",
+        "searchkey": "",
+        "searchindex": "disc",
+        "roleinformation": "- You are a Supply Chain expert working at Deloitte Canada\n- You have been provided with a document called DISC. When asked a question, leverage your learnings from DISC\n- Leverage your existing knowledge base to further enhance the response\n- If you don't find relevant information in DISC, ask the users for further information and use your existing knowledge to give answers\n-Your first message should be 'Welcome to Deloitte Integrated Supply Chain (DISC) AI Chatbot. What can I help you with today?'."
       },
       {
         "value": "sales_genie",
         "label": "Sales Genie",
-        "searchEndpoint": "https://genaihackathonaisearch.search.windows.net",
-        "searchKey": "",
-        "searchIndex": null,
-        "roleInformation": "A professional who helps individuals identify and achieve their personal and professional goals."
+        "searchendpoint": "https://genaihackathonaisearch.search.windows.net",
+        "searchkey": "",
+        "searchindex": null,
+        "roleinformation": "A professional who helps individuals identify and achieve their personal and professional goals."
       }
     ],
     "writingTones": [
@@ -134,10 +134,10 @@
         "label": "Explain Like I'm Five"
       }
     ],
-    "showDownloadLink": true,
+    "showDownloadLink": false,
     "allowDarkModeToggle": true,
     "allowSettingsModal": true,
     "allowDatabaseModal": true,
-    "showTwitterLink": true,
-    "showFeedbackLink": true
+    "showTwitterLink": false,
+    "showFeedbackLink": false
   }

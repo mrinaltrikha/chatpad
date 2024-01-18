@@ -26,10 +26,10 @@ interface AvailableModel {
 interface WritingCharacter {
     value: string;
     label: string;
-    searchEndpoint: string;
-    searchKey: string;
-    searchIndex: string;
-    roleInformation: string;
+    searchendpoint: string;
+    searchkey: string;
+    searchindex: string;
+    roleinformation: string;
 }
   
 interface WritingFormat {

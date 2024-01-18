@@ -56,7 +56,7 @@ export function ChatRoute() {
 
   const getSystemMessage = () => {
     const message: string[] = [];
-    if (writingCharacter) message.push(`${config.writingCharacters.find(x => x.value == writingCharacter)?.roleInformation}`);
+    if (writingCharacter) message.push(`${config.writingCharacters.find(x => x.value == writingCharacter)?.roleinformation}`);
     if (writingTone) message.push(`\n- Respond in ${writingTone} tone.`);
     if (writingStyle) message.push(`\n- Respond in ${writingStyle} style.`);
     if (writingFormat) message.push(writingFormat);
@@ -124,9 +124,9 @@ export function ChatRoute() {
         ],
         chatId,
         messageId,
-        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchEndpoint : undefined,
-        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchKey : undefined,
-        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchIndex : undefined,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchendpoint : undefined,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchkey : undefined,
+        writingCharacter ? config.writingCharacters.find(x => x.value == writingCharacter)?.searchindex : undefined,
         writingCharacter ? getSystemMessage() : undefined
       );
 

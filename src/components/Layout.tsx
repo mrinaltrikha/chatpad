@@ -222,7 +222,7 @@ export function Layout() {
                   </Tooltip>
                 </DatabaseModal>
               )}
-              <Tooltip label="Source Code">
+              {/* <Tooltip label="Source Code">
                 <ActionIcon
                   component="a"
                   href="https://github.com/deiucanta/chatpad"
@@ -232,7 +232,7 @@ export function Layout() {
                 >
                   <IconBrandGithub size={20} />
                 </ActionIcon>
-              </Tooltip>
+              </Tooltip> */}
               {config.showTwitterLink && (
                 <Tooltip label="Follow on Twitter">
                   <ActionIcon
