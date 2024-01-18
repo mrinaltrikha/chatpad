@@ -133,19 +133,25 @@ export async function createStreamChatCompletion(
         let titleText = ppt_line.replace('Title: ', '')
         slide.addText(titleText, title_textboxOpts);
       } else if (slide) {
+        ppt_line = ppt_line.trim()
         let firstChar = ''
         if (ppt_line != '') {
           firstChar = ppt_line.charAt(0)
         }
 
-        if (/^\d+$/.test(firstChar)) {
-          ppt_line = '    ' + ppt_line
+        if (/^\d+$/.test(firstChar) || firstChar == '-') {
+          textRows.push([{
+            text: ppt_line,
+            options: { bullet: false, indentLevel: 1 }
+          }])
+        } else {
+          textRows.push([{
+            text: ppt_line,
+            options: { bullet: false }
+          }])
         }
 
-        textRows.push([{
-          text: ppt_line,
-          options: { bullet: false }
-        }])
+        
       }
     })
     if (slide) {
