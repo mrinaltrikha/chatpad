@@ -115,23 +115,36 @@ export async function createStreamChatCompletion(
     content.split('\n').forEach(ppt_line => {
       console.log(ppt_line)
 
-      if (ppt_line.startsWith('Slide ')) {
+      let titleText = ""
+      if (ppt_line.startsWith('Slide -')) {
         if (slide) {
           slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
         }
         slide = pres.addSlide()
         textRows = []
+        titleText = ppt_line.replace('Slide -', '')
+        // slide.addText(titleText.trim(), title_textboxOpts);
+      } else if (ppt_line.startsWith('Slide ')) {
+        if (slide) {
+          slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
+        }
+        slide = pres.addSlide()
+        textRows = []
+        titleText = ppt_line.replace('Slide ', '')
       } else if (ppt_line.startsWith('**Slide ')) {
         if (slide) {
           slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
         }
         slide = pres.addSlide()
         textRows = []
-        let titleText = ppt_line.replaceAll('**', '')
-        slide.addText(titleText, title_textboxOpts);
+        titleText = ppt_line.replace('**', '')
+        // slide.addText(titleText, title_textboxOpts);
       } else if (ppt_line.startsWith('Title:') && slide) {
-        let titleText = ppt_line.replace('Title: ', '')
-        slide.addText(titleText, title_textboxOpts);
+        titleText = ppt_line.replace('Title: ', '')
+        // slide.addText(titleText, title_textboxOpts);
+      } else if (ppt_line.startsWith('- Title:') && slide) {
+        titleText = ppt_line.replace('- Title:', '')
+        // slide.addText(titleText, title_textboxOpts);
       } else if (slide) {
         ppt_line = ppt_line.trim()
         let firstChar = ''
@@ -151,6 +164,11 @@ export async function createStreamChatCompletion(
           }])
         }
       }
+
+      if (slide && titleText != '') {
+        slide.addText(titleText.trim().replaceAll("**", "") , title_textboxOpts);
+      }
+
     })
     if (slide) {
       slide.addTable(JSON.parse(JSON.stringify(textRows)), text_textboxOpts);
